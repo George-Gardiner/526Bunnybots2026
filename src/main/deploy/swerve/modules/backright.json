@@ -2,12 +2,12 @@
   "$schema": "https://config.yagsl.com/schemas/module.json",
   "drive": {
     "type": "talonfx_krakenx60",
-    "id": 10,
+    "id": 11,
     "canbus": ""
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 11,
+    "id": 10,
     "canbus": ""
   },
   "inverted": {

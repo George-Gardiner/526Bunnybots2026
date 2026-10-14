@@ -2,7 +2,7 @@
   "$schema": "https://config.yagsl.com/schemas/module.json",
   "drive": {
     "type": "talonfx_krakenx60",
-    "id": 5,
+    "id": 2,
     "canbus": ""
   },
   "angle": {
@@ -16,7 +16,7 @@
   },
   "absoluteEncoder": {
     "type": "cancoder_can",
-    "id": 6,
+    "id": 3,
     "channel": 0,
     "canbus": ""
   },

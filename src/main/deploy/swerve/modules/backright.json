@@ -7,7 +7,7 @@
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 10,
+    "id": 13,
     "canbus": ""
   },
   "inverted": {

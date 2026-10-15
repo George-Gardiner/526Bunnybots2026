@@ -12,11 +12,14 @@ public class RobotContainer
   private final SwerveDriveSubsystem swerve = new SwerveDriveSubsystem();
 
   private final SwerveInputStream driveAngularVelocity =
-      swerve.getAngularVelocityStream(
-                driverXbox::getLeftY,
-                () -> driverXbox.getLeftX(),
-                () -> driverXbox.getRawAxis(2))
-            .withAllianceRelativeControl();
+      // swerve.getAngularVelocityStream(
+      //           driverXbox::getLeftY,
+      //           () -> driverXbox.getLeftX(),
+      //           () -> driverXbox.getRawAxis(2))
+      //       .withAllianceRelativeControl();
+      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> driverXbox.getLeftX()).withControllerRotationAxis(() -> driverXbox.getRightX())
+      .withAllianceRelativeControl()
+      .deadband(0.1);
 
   public RobotContainer()
   {

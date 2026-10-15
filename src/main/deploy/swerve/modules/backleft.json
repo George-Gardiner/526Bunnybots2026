@@ -20,7 +20,7 @@
     "channel": 0,
     "canbus": ""
   },
-  "absoluteEncoderOffset": 0,
+  "absoluteEncoderOffset": 228.25,
   "absoluteEncoderInverted": false,
   "location": {
     "front": -12.25,

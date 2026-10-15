@@ -53,6 +53,10 @@ public class SwerveDriveSubsystem extends SubsystemBase
     }
   }
 
+  public SwerveDrive getSwerveDrive() {
+    return drive;
+  }
+
   public SwerveInputStream getAngularVelocityStream(DoubleSupplier x, DoubleSupplier y,
                                                     DoubleSupplier rot)
   {

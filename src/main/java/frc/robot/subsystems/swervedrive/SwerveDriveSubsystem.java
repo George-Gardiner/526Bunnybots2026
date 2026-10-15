@@ -37,10 +37,10 @@ public class SwerveDriveSubsystem extends SubsystemBase
     var cfg = new SwerveDriveConfig()
         .withStartingPose(new Pose2d(3, 3, Rotation2d.kZero))
         .withSubsystem(this)
-        .withTranslationController(new PIDController(1.0, 0.0, 0.0))
-        .withRotationController(new PIDController(1.0, 0.0, 0.0))
+        .withTranslationController(new PIDController(2.5, 0.0, 0.0))
+        .withRotationController(new PIDController(2.5, 0.0, 0.0))
         .withGyro(() -> Degrees.of(navX.getAngle()))
-        .withGyroInverted(false)
+        .withGyroInverted(true)
         .withTelemetry("swerve", TelemetryVerbosity.HIGH);
     
         try

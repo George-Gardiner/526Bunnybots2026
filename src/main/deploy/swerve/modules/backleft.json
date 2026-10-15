@@ -11,7 +11,7 @@
     "canbus": ""
   },
   "inverted": {
-    "drive": false,
+    "drive": true,
     "angle": false
   },
   "absoluteEncoder": {
@@ -20,7 +20,7 @@
     "channel": 0,
     "canbus": ""
   },
-  "absoluteEncoderOffset": 228.25,
+  "absoluteEncoderOffset": 229.043,
   "absoluteEncoderInverted": false,
   "location": {
     "front": -12.25,

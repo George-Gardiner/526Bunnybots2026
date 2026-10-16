@@ -17,7 +17,7 @@ public class RobotContainer
       //           () -> driverXbox.getLeftX(),
       //           () -> driverXbox.getRawAxis(2))
       //       .withAllianceRelativeControl();
-      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> driverXbox.getLeftX()).withControllerRotationAxis(() -> driverXbox.getRightX())
+      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> driverXbox.getLeftX()).withControllerRotationAxis(() -> -driverXbox.getRightX())
       .withAllianceRelativeControl()
       .deadband(0.2);
 
@@ -32,6 +32,6 @@ public class RobotContainer
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
 
     // Zero the gyro with Start + Back — use this if the field-relative heading drifts
-    driverXbox.start().and(driverXbox.back()).onTrue(swerve.zeroGyro());
+    driverXbox.y().onTrue(swerve.zeroGyro());
   }
 }

@@ -46,11 +46,19 @@ public class BeltDexerSubsystem {
         pidB = motorB.getClosedLoopController();
     }
 
-    public void setMotorAPosition(double position) {
+    public void setMotorAPosition(double position) { // in rotations according to setSetpoint, but will be converted to degrees by the encoder conversion factor maybe, idk, maybe not
         pidA.setSetpoint(position, SparkBase.ControlType.kPosition);
     }
 
     public void setMotorBPosition(double position) {
         pidB.setSetpoint(position, SparkBase.ControlType.kPosition);
+    }
+
+    public void setMotorAVelocity(double velocity) {
+        pidA.setSetpoint(velocity, SparkBase.ControlType.kVelocity);
+    }
+
+    public void setMotorBVelocity(double velocity) {
+        pidB.setSetpoint(velocity, SparkBase.ControlType.kVelocity);
     }
 }

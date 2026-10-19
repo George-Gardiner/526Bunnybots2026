@@ -19,8 +19,6 @@ public class BeltDexerSubsystem {
     public BeltDexerSubsystem() {
         motorA = new SparkMax(BeltDexerConstants.MotorcanIDA, SparkLowLevel.MotorType.kBrushless);
         motorB = new SparkMax(BeltDexerConstants.MotorcanIDB, SparkLowLevel.MotorType.kBrushless);
-        encoderA = motorA.getEncoder();
-        encoderB = motorB.getEncoder();
         SparkMaxConfig configA = new SparkMaxConfig();
         SparkMaxConfig configB = new SparkMaxConfig();
         configA.inverted(BeltDexerConstants.invertA);
@@ -35,5 +33,24 @@ public class BeltDexerSubsystem {
         configB.encoder
                 .positionConversionFactor(360 / BeltDexerConstants.gearRatioB)
                 .velocityConversionFactor((360.0/60.0) / BeltDexerConstants.gearRatioB);
+        configA.closedLoop
+                .pid(BeltDexerConstants.MotorAP, BeltDexerConstants.MotorAI, BeltDexerConstants.MotorAD);
+        configB.closedLoop
+                .pid(BeltDexerConstants.MotorBP, BeltDexerConstants.MotorBI, BeltDexerConstants.MotorBD);
+        motorA.configure(configA, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motorB.configure(configB, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        encoderA = motorA.getEncoder();
+        encoderB = motorB.getEncoder();
+        pidA = motorA.getClosedLoopController();
+        pidB = motorB.getClosedLoopController();
+    }
+
+    public void setMotorAPosition(double position) {
+        pidA.setSetpoint(position, SparkBase.ControlType.kPosition);
+    }
+
+    public void setMotorBPosition(double position) {
+        pidB.setSetpoint(position, SparkBase.ControlType.kPosition);
     }
 }

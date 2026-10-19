@@ -16,4 +16,18 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static class BeltDexerConstants {
+    public static final int MotorcanIDA = 14;
+    public static final int MotorcanIDB = 15;
+    public static final double gearRatioA = 1;
+    public static final double gearRatioB = 3;
+    public static final boolean invertA = false;
+    public static final boolean invertB = false;
+    public static final double MotorAP = 1;
+    public static final double MotorAI = 0;
+    public static final double MotorAD = 0;
+    public static final double MotorBP = 1;
+    public static final double MotorBI = 0;
+    public static final double MotorBD = 0;
+  }
 }

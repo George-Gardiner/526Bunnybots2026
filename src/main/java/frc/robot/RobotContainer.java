@@ -2,6 +2,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.button.CommandStadiaController;
 //testing testing Josie was here
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.subsystems.swervedrive.SwerveDriveSubsystem;
 import frc.robot.subsystems.BeltDexerSubsystem.BeltDexerSubsystem;
 import yams.mechanisms.swerve.utility.SwerveInputStream;
@@ -32,6 +33,7 @@ public class RobotContainer
 
   private void configureBindings()
   {
+    RobotModeTriggers.test().whileTrue(Commands.idle(swerve).withName("Live Tuning"));
     // set a default command. This is the command that runs if no other command is set
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
   //indexer.setDefaultCommand(Commands.run(() -> { indexer.setMotorAPower(0); indexer.setMotorBPower(0); }, indexer));

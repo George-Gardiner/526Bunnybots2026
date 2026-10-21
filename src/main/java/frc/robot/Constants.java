@@ -46,5 +46,7 @@ public final class Constants {
     public static final double MotorBP = 1;
     public static final double MotorBI = 0;
     public static final double MotorBD = 0;
+    public static final double MotorASpeed = 0.3;
+    public static final double MotorBSpeed = 0.3;
   }
 }

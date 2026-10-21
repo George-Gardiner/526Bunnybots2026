@@ -83,16 +83,16 @@ public class BeltDexerSubsystem extends SubsystemBase {
     }
 
     public Command runDexer() {
-    return Commands.startEnd(
-        () -> {
-            motorA.set(0.3);
-            motorB.set(0.3);
-        },
-        () -> {
-            motorA.stopMotor();
-            motorB.stopMotor();
-        },
-        this
-    );
-}
+        return Commands.startEnd(
+            () -> {
+                motorA.set(BeltDexerConstants.MotorASpeed);
+                motorB.set(BeltDexerConstants.MotorBSpeed);
+            },
+            () -> {
+                motorA.stopMotor();
+                motorB.stopMotor();
+            },
+            this
+        );
+    }
 }

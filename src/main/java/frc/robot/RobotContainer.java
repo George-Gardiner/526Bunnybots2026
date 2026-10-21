@@ -32,11 +32,11 @@ public class RobotContainer
 
   private void configureBindings()
   {
-    // Default drive command
+    // set a default command. This is the command that runs if no other command is set
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
-    indexer.setDefaultCommand(Commands.run(() -> { indexer.setMotorAPower(0); indexer.setMotorBPower(0); }, indexer));
-    // Zero the gyro with Start + Back — use this if the field-relative heading drifts
-    driverXbox.y().onTrue(swerve.zeroGyro());
-    driverXbox.a().onTrue(indexer.runDexer());
+  //indexer.setDefaultCommand(Commands.run(() -> { indexer.setMotorAPower(0); indexer.setMotorBPower(0); }, indexer));
+    // When a or y button is pressed, add these command to the command sceduler
+    driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
+    driverXbox.a().toggleOnTrue(indexer.runDexer());
   }
 }

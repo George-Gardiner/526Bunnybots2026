@@ -30,7 +30,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
 
   private SwerveDrive drive;
 
-  private AHRS navX = new AHRS(NavXComType.kMXP_SPI);
+  private AHRS navX = new AHRS(NavXComType.kUSB1);
 
   public SwerveDriveSubsystem()
   {
@@ -39,7 +39,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
         .withSubsystem(this)
         .withTranslationController(new PIDController(2.5, 0.0, 0.0))
         .withRotationController(new PIDController(2.5, 0.0, 0.0))
-        .withGyro(() -> Degrees.of(navX.getAngle()))
+        .withGyro(() -> Degrees.of(navX.getYaw()))
         .withGyroInverted(true)
         .withTelemetry("swerve", TelemetryVerbosity.HIGH);
     
@@ -79,6 +79,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
   public void periodic()
   {
     SmartDashboard.putData(navX);
+    SmartDashboard.putNumber("navX real value", navX.getYaw());
     drive.updateTelemetry();
   }
 

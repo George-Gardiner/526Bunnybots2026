@@ -60,7 +60,7 @@ public class BeltDexerSubsystem extends SubsystemBase {
     public void setMotorBPosition(double position) {
         pidB.setSetpoint(position, SparkBase.ControlType.kPosition);
     }
-
+ 
     public void setMotorAVelocity(double velocity) {
         pidA.setSetpoint(velocity, SparkBase.ControlType.kVelocity);
     }
@@ -85,8 +85,8 @@ public class BeltDexerSubsystem extends SubsystemBase {
     public Command runDexer() {
         return Commands.startEnd(
             () -> {
-                motorA.set(BeltDexerConstants.MotorASpeed);
-                motorB.set(BeltDexerConstants.MotorBSpeed);
+                motorA.set(-BeltDexerConstants.MotorASpeed);
+                motorB.set(-BeltDexerConstants.MotorBSpeed);
             },
             () -> {
                 motorA.stopMotor();

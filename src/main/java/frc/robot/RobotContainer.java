@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.subsystems.swervedrive.SwerveDriveSubsystem;
 import frc.robot.subsystems.BeltDexerSubsystem.BeltDexerSubsystem;
 import yams.mechanisms.swerve.utility.SwerveInputStream;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer
@@ -40,5 +42,6 @@ public class RobotContainer
     // When a or y button is pressed, add these command to the command sceduler
     driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
     driverXbox.a().toggleOnTrue(indexer.runDexer());
+    driverXbox.b().onTrue(swerve.setWheelsZero());
   }
 }

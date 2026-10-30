@@ -3,6 +3,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +40,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
         .withSubsystem(this)
         .withTranslationController(new PIDController(2.5, 0.0, 0.0))
         .withRotationController(new PIDController(2.5, 0.0, 0.0))
-        .withGyro(() -> Degrees.of(navX.getYaw()))
+        .withGyro(() -> Degrees.of(navX.getAngle()))
         .withGyroInverted(true)
         .withTelemetry("swerve", TelemetryVerbosity.HIGH);
     
@@ -75,11 +76,17 @@ public class SwerveDriveSubsystem extends SubsystemBase
     return runOnce(() -> drive.zeroGyro());
   }
 
+  //this command is INTENTIONALLY confusing >:)
+  public Command setWheelsZero() {
+      return runOnce(() -> drive.setSwerveModuleStates(new SwerveModuleState[] { new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)) }));
+  }
+
   @Override
   public void periodic()
   {
     SmartDashboard.putData(navX);
     SmartDashboard.putNumber("navX real value", navX.getYaw());
+    SmartDashboard.putNumber("cancoder real value", navX.getAngle());
     drive.updateTelemetry();
   }
 

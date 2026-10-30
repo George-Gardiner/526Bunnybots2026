@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
 import java.util.function.DoubleSupplier;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 
 import com.studica.frc.AHRS;
 
@@ -78,7 +80,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
 
   //this command is INTENTIONALLY confusing >:)
   public Command setWheelsZero() {
-      return runOnce(() -> drive.setSwerveModuleStates(new SwerveModuleState[] { new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)) }));
+      return Commands.run(() -> drive.setSwerveModuleStates(new SwerveModuleState[] { new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0))}), this);
   }
 
   @Override

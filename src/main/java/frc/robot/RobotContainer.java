@@ -41,7 +41,7 @@ public class RobotContainer
   //indexer.setDefaultCommand(Commands.run(() -> { indexer.setMotorAPower(0); indexer.setMotorBPower(0); }, indexer));
     // When a or y button is pressed, add these command to the command sceduler
     driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
-    driverXbox.a().toggleOnTrue(indexer.runDexer());
-    driverXbox.b().onTrue(swerve.setWheelsZero());
+    driverXbox.a().onTrue(indexer.runDexer());
+    driverXbox.b().toggleOnTrue(swerve.setWheelsZero());
   }
 }

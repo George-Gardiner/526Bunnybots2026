@@ -1,4 +1,5 @@
 package frc.robot.subsystems.swervedrive;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 
 import com.studica.frc.AHRS;
 
@@ -28,15 +28,13 @@ import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.units.measure.Angle;
 import static edu.wpi.first.units.Units.Degrees;
 
-public class SwerveDriveSubsystem extends SubsystemBase
-{
+public class SwerveDriveSubsystem extends SubsystemBase {
 
   private SwerveDrive drive;
 
   private AHRS navX = new AHRS(NavXComType.kUSB1);
 
-  public SwerveDriveSubsystem()
-  {
+  public SwerveDriveSubsystem() {
     var cfg = new SwerveDriveConfig()
         .withStartingPose(new Pose2d(3, 3, Rotation2d.kZero))
         .withSubsystem(this)
@@ -45,15 +43,13 @@ public class SwerveDriveSubsystem extends SubsystemBase
         .withGyro(() -> Degrees.of(navX.getAngle()))
         .withGyroInverted(true)
         .withTelemetry("swerve", TelemetryVerbosity.HIGH);
-    
-        try
-    {
-      drive = SwerveParser.parse(new File(Filesystem.getDeployDirectory(), "swerve"))
-          .createSwerveDrive(cfg);
-    } catch (Exception e)
-    {
+    cfg.withGyroAngularVelocityScaleFactor(0);
+    try {
+      SwerveParser.parse(new File(Filesystem.getDeployDirectory(), "swerve"));
+      SwerveParser.createSwerveDrive(cfg);
+    } catch (Exception e) {
       throw new RuntimeException(e);
-    }    
+    }
   }
 
   public SwerveDrive getSwerveDrive() {
@@ -61,31 +57,30 @@ public class SwerveDriveSubsystem extends SubsystemBase
   }
 
   public SwerveInputStream getAngularVelocityStream(DoubleSupplier x, DoubleSupplier y,
-                                                    DoubleSupplier rot)
-  {
+      DoubleSupplier rot) {
     return new SwerveInputStream(drive, x, y, rot);
   }
 
-  public Command drive(SwerveInputStream stream)
-  {
+  public Command drive(SwerveInputStream stream) {
     return drive.drive(() -> ChassisSpeeds.fromFieldRelativeSpeeds(stream.get(),
-                                                                   new Rotation2d(drive.getGyroAngle())));
+        new Rotation2d(drive.getGyroAngle())));
   }
 
   /** Zero the gyro heading. Bind this to a button combo for field recovery. */
-  public Command zeroGyro()
-  {
+  public Command zeroGyro() {
     return runOnce(() -> drive.zeroGyro());
   }
 
-  //this command is INTENTIONALLY confusing >:)
+  // this command is INTENTIONALLY confusing >:)
   public Command setWheelsZero() {
-      return Commands.run(() -> drive.setSwerveModuleStates(new SwerveModuleState[] { new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0))}), this);
+    return Commands.run(() -> drive.setSwerveModuleStates(new SwerveModuleState[] {
+        new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+        new SwerveModuleState(0, Rotation2d.fromDegrees(0)), new SwerveModuleState(0, Rotation2d.fromDegrees(0)) }),
+        this);
   }
 
   @Override
-  public void periodic()
-  {
+  public void periodic() {
     SmartDashboard.putData(navX);
     SmartDashboard.putNumber("navX real value", navX.getYaw());
     SmartDashboard.putNumber("cancoder real value", navX.getAngle());
@@ -93,8 +88,7 @@ public class SwerveDriveSubsystem extends SubsystemBase
   }
 
   @Override
-  public void simulationPeriodic()
-  {
+  public void simulationPeriodic() {
     drive.simIterate();
   }
 }

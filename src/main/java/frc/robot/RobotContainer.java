@@ -24,7 +24,7 @@ public class RobotContainer
       //           () -> driverXbox.getLeftX(),
       //           () -> driverXbox.getRawAxis(2))
       //       .withAllianceRelativeControl();
-      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> driverXbox.getLeftX()).withControllerRotationAxis(() -> -driverXbox.getRightX())
+      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> 0).withControllerRotationAxis(() -> -driverXbox.getRightX())
       .withAllianceRelativeControl()
       .deadband(0.1);
 

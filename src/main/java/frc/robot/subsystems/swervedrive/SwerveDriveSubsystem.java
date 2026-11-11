@@ -42,11 +42,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         .withRotationController(new PIDController(2.5, 0.0, 0.0))
         .withGyro(() -> Degrees.of(navX.getAngle()))
         .withGyroInverted(true)
-        .withTelemetry("swerve", TelemetryVerbosity.HIGH);
-    cfg.withGyroAngularVelocityScaleFactor(0);
+        .withTelemetry("swerve", TelemetryVerbosity.HIGH)
+        .withGyroAngularVelocityScaleFactor(0.305);
     try {
-      SwerveParser.parse(new File(Filesystem.getDeployDirectory(), "swerve"));
-      SwerveParser.createSwerveDrive(cfg);
+      drive = SwerveParser.parse(new File(Filesystem.getDeployDirectory(), "swerve"))
+          .createSwerveDrive(cfg);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

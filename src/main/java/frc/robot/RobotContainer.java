@@ -43,5 +43,6 @@ public class RobotContainer
     driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
     driverXbox.a().onTrue(indexer.runDexer());
     driverXbox.b().toggleOnTrue(swerve.setWheelsZero());
+    //make a bind for slapdown soon
   }
 }

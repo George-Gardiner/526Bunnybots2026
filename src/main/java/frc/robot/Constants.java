@@ -49,4 +49,17 @@ public final class Constants {
     public static final double MotorASpeed = 0.3;
     public static final double MotorBSpeed = 0.9;
   }
+  public static class SlapdownConstants {
+    public static final int pivotMotorID = 100; //please get the actual can id
+    public static final int rollerMotorID = 110; //please get the actual can id
+    public static final boolean invertPivot = false;
+    public static final boolean invertRoller = false;
+    public static final int pivotCurrentLimit = 40;
+    public static final int rollerCurrentLimit = 40;
+    public static final double pivotP = 0;
+    public static final double pivotI = 0;
+    public static final double pivotD = 0;
+    public static final double pivotRaisedAngle = 0;
+    public static final double pivotLoweringAngle = 0;
+  }
 }

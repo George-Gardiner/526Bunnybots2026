@@ -1,5 +1,6 @@
 package frc.robot.subsystems.BeltDexerSubsystem;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -12,6 +13,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -19,25 +21,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SlapdownConstants;
 
 public class SlapdownSubsystem extends SubsystemBase {
-    private final SparkMax motorPivot;
+    private final SparkMax motorPivotLeft;
+    private final SparkMax motorPivotRight;
     private final SparkMax motorRoller;
-    private final SparkClosedLoopController pidPivot;
+    private final SparkClosedLoopController pidPivotLeft;
+    private final SparkClosedLoopController pidPivotRight;
     private final SparkMaxConfig pivotMotorConfig;
     private final SparkMaxConfig rollerMotorConfig;    
     private boolean isRollerEnabled;
-    
-    public enum PivotState {
-        RAISING,
-        LOWERING
-    }
-    public PivotState pivotState = PivotState.RAISING;
+    private boolean isLowering;
+    AbsoluteEncoder throughBore;
 
     public SlapdownSubsystem() {
-        motorPivot = new SparkMax(SlapdownConstants.pivotMotorID, SparkLowLevel.MotorType.kBrushless);
+        motorPivotLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
+        motorPivotRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
         pivotMotorConfig = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
-
+        try {
+           throughBore = motorPivotLeft.getAbsoluteEncoder();
+        } 
+        catch (IllegalStateException e) {
+          System.out.println(e.getMessage());
+        }
         pivotMotorConfig.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfig.idleMode(IdleMode.kCoast);
         pivotMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
@@ -47,59 +53,53 @@ public class SlapdownSubsystem extends SubsystemBase {
         rollerMotorConfig.idleMode(IdleMode.kCoast);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
 
-        motorPivot.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motorPivotLeft.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorRoller.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        pidPivot = motorPivot.getClosedLoopController();
+        pidPivotLeft = motorPivotLeft.getClosedLoopController();
+        pidPivotRight = motorPivotLeft.getClosedLoopController();
 
-        SmartDashboard.setDefaultString("Intake/Pivot State", pivotState.toString());
+        SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
   }
 
   @Override
-  /* Periodically raises/lowers the pivot depending on its current state. Will not run if in lowered/lowering state. */
   public void periodic() {
-    
+    SmartDashboard.putNumber("Pivot Angle:", throughBore.getPosition());
   }
 
-  public void setPivotState(PivotState newState){
-    pivotState = newState;
-    SmartDashboard.putString("Intake/Pivot State", pivotState.toString());
-    switch (newState){
-      case RAISING:
-        setPivotAngle(SlapdownConstants.pivotRaisedAngle);
-        break;
-      case LOWERING:
+  public void movePivot(boolean isLowering) {
+    SmartDashboard.putBoolean("Is Intake Lowering/Lowered?", isLowering);
+    if (isLowering)
         setPivotAngle(SlapdownConstants.pivotLoweringAngle);
-        break;
-      default:
-        break;
+    else {
+        setPivotAngle(SlapdownConstants.pivotRaisedAngle);
     }
   }
 
   public void toggleRoller() {
-    setRoller(!isRollerEnabled);
+    setRoller(isRollerEnabled);
   }
 
   public void setRoller(boolean enabled) {
     if (enabled) {
-      motorRoller.set(5); //change ts
+      motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
     } 
-    else {
+    else {  
       stopRoller();
     }
-    isRollerEnabled = enabled;
     SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   }
 
   //make this later
   public void setRollerReversed(boolean enabled) {
-
+    motorPivotLeft.set(-SlapdownConstants.rollerDutyCycleSpeed);
   }
 
   public void setPivotAngle(double angle) {
-    pidPivot.setSetpoint(angle, ControlType.kPosition);
+    pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
+    pidPivotRight.setSetpoint(angle, ControlType.kPosition);
   }
 
   public void stop() {
@@ -107,61 +107,36 @@ public class SlapdownSubsystem extends SubsystemBase {
     stopPivot();
   }
 
-  /* Set the pivot motor speed to 0. */
   public void stopPivot() {
-    motorPivot.stopMotor();
+    motorPivotLeft.stopMotor();
+    motorPivotRight.stopMotor();
   }
 
-  /* Set the roller motor speed to 0. */
   public void stopRoller() {
     motorRoller.stopMotor();
   }
 
-  /**
-   * Enable the intake roller. If the intake is raised, it will lower and then start.
-   *
-   * @return a command to toggle the intake
-   */
-  public Command intakeCommand() {
-    // Inline construction of command goes here.
-    return startEnd(
-            () -> {
-              if (pivotState == PivotState.LOWERING) {
-                setRoller(true);
-              }
-              else {
-                setRoller(true);
-                setPivotState(PivotState.LOWERING);
-              }
-            },
-            () -> setRoller(false));
+  public double getAngle() {
+    return throughBore.getPosition();
   }
 
-  /**
-   * Toggle the intake roller. If the intake is raised, it will lower and then start.
-   *
-   * @return a command to toggle the intake
-   */
-  public Command toggleIntakeCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
+  public Command intakeCommand() {
     return runOnce(
-        () -> {
-          if (pivotState == PivotState.LOWERING) {
-            toggleRoller();
-          }
-          else {
-            setRoller(true);
-            setPivotState(PivotState.LOWERING);
-          }
-        });
+            () -> {
+              if (isLowering) {
+                setRoller(true);
+                movePivot(isLowering);
+                isLowering = false;
+              }
+              else {
+                setRoller(false);
+                movePivot(isLowering);
+                isLowering = true;
+              }
+            });
   }
+
   
-  /**
-   * Reverse the intake roller while held
-   *
-   * @return a command to reverse the intake
-   */
   public Command reverseIntakeCommand() {
     return startEnd(
       () -> setRollerReversed(true), 
@@ -169,14 +144,6 @@ public class SlapdownSubsystem extends SubsystemBase {
     );
   }
 
-  public Command resetIntakeCommand() {
-    // Subsystem: RunOnce implicitly requires this subsystem.
-    return runOnce(
-        () -> {
-          setRoller(false);
-          setPivotState(PivotState.RAISING);
-        });
-  }
 
   @Override
   public void simulationPeriodic() {

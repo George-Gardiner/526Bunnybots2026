@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.subsystems.swervedrive.SwerveDriveSubsystem;
 import frc.robot.subsystems.BeltDexerSubsystem.BeltDexerSubsystem;
+import frc.robot.subsystems.BeltDexerSubsystem.SlapdownSubsystem;
 import yams.mechanisms.swerve.utility.SwerveInputStream;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,6 +18,7 @@ public class RobotContainer
 
   private final SwerveDriveSubsystem swerve = new SwerveDriveSubsystem();
   private final BeltDexerSubsystem indexer = new BeltDexerSubsystem();
+  private final SlapdownSubsystem slapdown = new SlapdownSubsystem();
 
   private final SwerveInputStream driveAngularVelocity =
       // swerve.getAngularVelocityStream(
@@ -38,11 +40,10 @@ public class RobotContainer
     RobotModeTriggers.test().whileTrue(Commands.idle(swerve).withName("Live Tuning"));
     // set a default command. This is the command that runs if no other command is set
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
-  //indexer.setDefaultCommand(Commands.run(() -> { indexer.setMotorAPower(0); indexer.setMotorBPower(0); }, indexer));
     // When a or y button is pressed, add these command to the command sceduler
     driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
-    driverXbox.a().onTrue(indexer.runDexer());
+    driverXbox.a().whileTrue(indexer.runDexer());
     driverXbox.b().toggleOnTrue(swerve.setWheelsZero());
-    //make a bind for slapdown soon
+    driverXbox.x().toggleOnTrue(slapdown.intakeCommand());
   }
 }

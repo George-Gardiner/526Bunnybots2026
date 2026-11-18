@@ -18,8 +18,6 @@ import frc.robot.Constants.BeltDexerConstants;
 public class BeltDexerSubsystem extends SubsystemBase {
     private SparkMax motorA;
     private SparkMax motorB;
-    private RelativeEncoder encoderA;
-    private RelativeEncoder encoderB;
     private SparkClosedLoopController pidA;
     private SparkClosedLoopController pidB;
 
@@ -47,8 +45,6 @@ public class BeltDexerSubsystem extends SubsystemBase {
         motorA.configure(configA, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorB.configure(configB, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        encoderA = motorA.getEncoder();
-        encoderB = motorB.getEncoder();
         pidA = motorA.getClosedLoopController();
         pidB = motorB.getClosedLoopController();
     }
@@ -89,8 +85,7 @@ public class BeltDexerSubsystem extends SubsystemBase {
                 motorB.set(-BeltDexerConstants.MotorBSpeed);
             },
             () -> {
-                motorA.stopMotor();
-                motorB.stopMotor();
+                stop();
             },
             this
         );

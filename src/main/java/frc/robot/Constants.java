@@ -57,11 +57,11 @@ public final class Constants {
     public static final boolean invertRoller = false;
     public static final int pivotCurrentLimit = 40;
     public static final int rollerCurrentLimit = 40;
-    public static final double pivotP = 15;
+    public static final double pivotP = 1;
     public static final double pivotI = 0;
     public static final double pivotD = 0;
     public static final double pivotRaisedAngle = 0;
     public static final double pivotLoweringAngle = 90;
     public static final double rollerDutyCycleSpeed = 5;
-  }
+  } 
 }

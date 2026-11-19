@@ -4,6 +4,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -26,7 +27,8 @@ public class SlapdownSubsystem extends SubsystemBase {
     private final SparkMax motorRoller;
     private final SparkClosedLoopController pidPivotLeft;
     private final SparkClosedLoopController pidPivotRight;
-    private final SparkMaxConfig pivotMotorConfig;
+    private final SparkMaxConfig pivotMotorConfigLeft;
+    private final SparkMaxConfig pivotMotorConfigRight;
     private final SparkMaxConfig rollerMotorConfig;    
     private boolean isRollerEnabled;
     private boolean isLowering;
@@ -36,7 +38,8 @@ public class SlapdownSubsystem extends SubsystemBase {
         motorPivotLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
         motorPivotRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
-        pivotMotorConfig = new SparkMaxConfig();
+        pivotMotorConfigLeft = new SparkMaxConfig();
+        pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
         try {
            throughBore = motorPivotLeft.getAbsoluteEncoder();
@@ -44,24 +47,30 @@ public class SlapdownSubsystem extends SubsystemBase {
         catch (IllegalStateException e) {
           System.out.println(e.getMessage());
         }
-        pivotMotorConfig.inverted(SlapdownConstants.invertPivot);
-        pivotMotorConfig.idleMode(IdleMode.kCoast);
-        pivotMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
-        pivotMotorConfig.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
+        pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivotLeft);
+        pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
+        pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
+        pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
+        pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
 
-        motorPivotLeft.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotorConfigRight.follow(motorPivotLeft, true);
+
+        motorPivotLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motorPivotRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorRoller.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+
         pidPivotLeft = motorPivotLeft.getClosedLoopController();
-        pidPivotRight = motorPivotLeft.getClosedLoopController();
+        pidPivotRight = motorPivotRight.getClosedLoopController();
 
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
+        isLowering = true;
   }
 
   @Override

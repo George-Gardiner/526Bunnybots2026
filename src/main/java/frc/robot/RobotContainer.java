@@ -26,7 +26,7 @@ public class RobotContainer
       //           () -> driverXbox.getLeftX(),
       //           () -> driverXbox.getRawAxis(2))
       //       .withAllianceRelativeControl();
-      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> 0).withControllerRotationAxis(() -> -driverXbox.getRightX())
+      SwerveInputStream.of(swerve.getSwerveDrive(), () -> driverXbox.getLeftY(), () -> driverXbox.getLeftX()).withControllerRotationAxis(() -> -driverXbox.getRightX())
       .withAllianceRelativeControl()
       .deadband(0.1);
 
@@ -44,6 +44,6 @@ public class RobotContainer
     driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
     driverXbox.a().whileTrue(indexer.runDexer());
     driverXbox.b().toggleOnTrue(swerve.setWheelsZero());
-    driverXbox.x().toggleOnTrue(slapdown.intakeCommand());
+    driverXbox.x().whileTrue(slapdown.intakeCommand());
   }
 }

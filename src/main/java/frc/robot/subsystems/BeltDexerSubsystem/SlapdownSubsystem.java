@@ -88,7 +88,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void toggleRoller() {
-    setRoller(isRollerEnabled);
+    setRoller(!isRollerEnabled);
   }
 
   public void setRoller(boolean enabled) {
@@ -98,6 +98,7 @@ public class SlapdownSubsystem extends SubsystemBase {
     else {  
       stopRoller();
     }
+    isRollerEnabled = enabled;
     SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   }
 

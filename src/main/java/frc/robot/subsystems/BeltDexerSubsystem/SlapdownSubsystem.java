@@ -33,6 +33,7 @@ public class SlapdownSubsystem extends SubsystemBase {
     private boolean isRollerEnabled;
     private boolean isLowering;
     AbsoluteEncoder throughBore;
+    private final SparkClosedLoopController pidRoller;
 
     public SlapdownSubsystem() {
         motorPivotLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
@@ -55,6 +56,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
+        rollerMotorConfig.closedLoop.pid(SlapdownConstants.rollerP, SlapdownConstants.rollerI, SlapdownConstants.rollerD);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
 
         pivotMotorConfigRight.follow(motorPivotLeft, true);
@@ -66,6 +68,8 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         pidPivotLeft = motorPivotLeft.getClosedLoopController();
         pidPivotRight = motorPivotRight.getClosedLoopController();
+
+        pidRoller = motorRoller.getClosedLoopController();
 
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
@@ -93,9 +97,9 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void setRoller(boolean enabled) {
     if (enabled) {
-      motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
-    } 
-    else {  
+      pidRoller.setSetpoint(SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+    }
+    else {
       stopRoller();
     }
     isRollerEnabled = enabled;
@@ -104,7 +108,14 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   //make this later
   public void setRollerReversed(boolean enabled) {
-    motorPivotLeft.set(-SlapdownConstants.rollerDutyCycleSpeed);
+    if (enabled) {
+      pidRoller.setSetpoint(-SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+    }
+    else {
+      stopRoller();
+    }
+    isRollerEnabled = enabled;
+    SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   }
 
   public void setPivotAngle(double angle) {

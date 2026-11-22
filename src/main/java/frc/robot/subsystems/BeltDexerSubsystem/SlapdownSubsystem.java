@@ -131,7 +131,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return run(
+    return runOnce(
             () -> {
               if (isLowering) {
                 setRoller(true);

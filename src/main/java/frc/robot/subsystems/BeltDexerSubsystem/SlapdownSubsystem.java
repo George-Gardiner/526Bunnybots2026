@@ -88,17 +88,16 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void toggleRoller() {
-    setRoller(!isRollerEnabled);
+    setRoller(isRollerEnabled);
   }
 
   public void setRoller(boolean enabled) {
     if (enabled) {
       motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
     } 
-    else {
+    else {  
       stopRoller();
     }
-    isRollerEnabled = enabled;
     SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   }
 

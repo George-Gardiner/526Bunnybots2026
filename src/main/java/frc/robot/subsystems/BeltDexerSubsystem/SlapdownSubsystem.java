@@ -23,25 +23,26 @@ import frc.robot.Constants.SlapdownConstants;
 
 public class SlapdownSubsystem extends SubsystemBase {
     private final SparkMax pivotMotorLeft;
-    private final SparkMax pivotMotorRight;
+    // private final SparkMax pivotMotorRight;
     private final SparkMax motorRoller;
     private final SparkClosedLoopController pidPivotLeft;
     private final SparkMaxConfig pivotMotorConfigLeft;
-    private final SparkMaxConfig pivotMotorConfigRight;
+    // private final SparkMaxConfig pivotMotorConfigRight;
     private final SparkMaxConfig rollerMotorConfig;    
     private boolean isRollerEnabled;
     private final SparkClosedLoopController pidRoller;
 
     public SlapdownSubsystem() {
         pivotMotorLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
-        pivotMotorRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
+        // pivotMotorRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
         pivotMotorConfigLeft = new SparkMaxConfig();
-        pivotMotorConfigRight = new SparkMaxConfig();
+        // pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
+        pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(100);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
@@ -49,10 +50,10 @@ public class SlapdownSubsystem extends SubsystemBase {
         rollerMotorConfig.closedLoop.pid(SlapdownConstants.rollerP, SlapdownConstants.rollerI, SlapdownConstants.rollerD);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
 
-        pivotMotorConfigRight.follow(pivotMotorLeft, true);
+        // pivotMotorConfigRight.follow(pivotMotorLeft, true);
 
         pivotMotorLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorRoller.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
@@ -98,7 +99,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void setPivotAngle(double angle) {
-    pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
+    pidPivotLeft.setSetpoint(angle, ControlType.kMAXMotionPositionControl);
   }
 
   public void stop() {
@@ -108,7 +109,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void stopPivot() {
     pivotMotorLeft.stopMotor();
-    pivotMotorRight.stopMotor();
+    // pivotMotorRight.stopMotor();
   }
 
   public void stopRoller() {

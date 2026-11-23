@@ -26,13 +26,10 @@ public class SlapdownSubsystem extends SubsystemBase {
     private final SparkMax motorPivotRight;
     private final SparkMax motorRoller;
     private final SparkClosedLoopController pidPivotLeft;
-    private final SparkClosedLoopController pidPivotRight;
     private final SparkMaxConfig pivotMotorConfigLeft;
     private final SparkMaxConfig pivotMotorConfigRight;
     private final SparkMaxConfig rollerMotorConfig;    
     private boolean isRollerEnabled;
-    private boolean isLowering;
-    AbsoluteEncoder throughBore;
     private final SparkClosedLoopController pidRoller;
 
     public SlapdownSubsystem() {
@@ -42,17 +39,10 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft = new SparkMaxConfig();
         pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
-        try {
-           throughBore = motorPivotLeft.getAbsoluteEncoder();
-        } 
-        catch (IllegalStateException e) {
-          System.out.println(e.getMessage());
-        }
-        pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivotLeft);
+        pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
-        pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
+        pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
-        pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
@@ -67,7 +57,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
 
         pidPivotLeft = motorPivotLeft.getClosedLoopController();
-        pidPivotRight = motorPivotRight.getClosedLoopController();
 
         pidRoller = motorRoller.getClosedLoopController();
 
@@ -78,7 +67,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Pivot Angle:", throughBore.getPosition());
+    ;
   }
 
   public void toggleRoller() {
@@ -110,7 +99,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void setPivotAngle(double angle) {
     pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
-    pidPivotRight.setSetpoint(angle, ControlType.kPosition);
   }
 
   public void stop() {
@@ -125,10 +113,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void stopRoller() {
     motorRoller.stopMotor();
-  }
-
-  public double getAngle() {
-    return throughBore.getPosition();
   }
 
   public Command intakeDownCommand() {

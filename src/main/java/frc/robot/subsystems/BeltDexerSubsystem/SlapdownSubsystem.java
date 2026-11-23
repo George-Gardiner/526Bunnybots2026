@@ -85,7 +85,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   public void movePivot(boolean isLowering) {
     SmartDashboard.putBoolean("Is Intake Lowering/Lowered?", isLowering);
     if (isLowering)
-        setPivotAngle(SlapdownConstants.pivotLoweringAngle);
+        setPivotAngle(SlapdownConstants.pivotLoweredAngle);
     else {
         setPivotAngle(SlapdownConstants.pivotRaisedAngle);
     }
@@ -164,7 +164,6 @@ public class SlapdownSubsystem extends SubsystemBase {
       () -> setRollerReversed(false)
     );
   }
-
 
   @Override
   public void simulationPeriodic() {

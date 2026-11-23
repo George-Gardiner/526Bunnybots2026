@@ -88,10 +88,6 @@ public class SlapdownSubsystem extends SubsystemBase {
     }
   }
 
-  public void toggleRoller() {
-    setRoller(isRollerEnabled);
-  }
-
   public void setRoller(boolean enabled) {
     if (enabled) {
       motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts

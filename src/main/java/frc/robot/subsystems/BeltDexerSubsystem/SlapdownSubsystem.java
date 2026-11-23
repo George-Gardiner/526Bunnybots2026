@@ -29,7 +29,7 @@ public class SlapdownSubsystem extends SubsystemBase {
     private final SparkClosedLoopController pidPivotRight;
     private final SparkMaxConfig pivotMotorConfigLeft;
     private final SparkMaxConfig pivotMotorConfigRight;
-    private final SparkMaxConfig rollerMotorConfig;    
+    private final SparkMaxConfig  rollerMotorConfig;    
     private boolean isRollerEnabled;
     private boolean isLowering;
     AbsoluteEncoder throughBore;
@@ -49,9 +49,10 @@ public class SlapdownSubsystem extends SubsystemBase {
         }
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivotLeft);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
-        pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
+        pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
-        pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        //pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
@@ -108,7 +109,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void setPivotAngle(double angle) {
     pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
-    pidPivotRight.setSetpoint(angle, ControlType.kPosition);
   }
 
   public void stop() {

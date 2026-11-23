@@ -51,7 +51,7 @@ public final class Constants {
   }
   public static class SlapdownConstants {
     public static final double rollerVelocity = 100; //in RPM
-    public static final double rollerP = 1;
+    public static final double rollerP = 0.0004;
     public static final double rollerI = 0;
     public static final double rollerD = 0;
     public static final int pivotMotorLeftID = 16; //something's wrong with this motor...

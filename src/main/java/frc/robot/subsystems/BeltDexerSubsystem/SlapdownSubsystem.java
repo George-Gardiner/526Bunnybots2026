@@ -42,7 +42,7 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
-        pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(100);
+           pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(100);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);

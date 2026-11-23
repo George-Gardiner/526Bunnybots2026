@@ -104,7 +104,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void setPivotAngle(double angle) {
-    pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
+    pidPivotLeft.setSetpoint(angle, ControlType.kMAXMotionPositionControl);
   }
 
   public void stop() {

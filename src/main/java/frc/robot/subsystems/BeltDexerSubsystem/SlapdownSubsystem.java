@@ -74,21 +74,11 @@ public class SlapdownSubsystem extends SubsystemBase {
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
-        isLowering = true;
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Pivot Angle:", throughBore.getPosition());
-  }
-
-  public void movePivot(boolean isLowering) {
-    SmartDashboard.putBoolean("Is Intake Lowering/Lowered?", isLowering);
-    if (isLowering)
-        setPivotAngle(SlapdownConstants.pivotLoweredAngle);
-    else {
-        setPivotAngle(SlapdownConstants.pivotRaisedAngle);
-    }
   }
 
   public void toggleRoller() {
@@ -141,24 +131,38 @@ public class SlapdownSubsystem extends SubsystemBase {
     return throughBore.getPosition();
   }
 
-  public Command intakeCommand() {
-    return runOnce(
+  public Command intakeDownCommand() {
+    return startEnd(
             () -> {
-              if (isLowering) {
-                setRoller(true);
-                movePivot(isLowering);
-                isLowering = false;
-              }
-              else {
-                setRoller(false);
-                movePivot(isLowering);
-                isLowering = true;
-              }
-            });
+              setPivotAngle(SlapdownConstants.pivotLoweredAngle);
+              setRoller(true);
+            },
+            () -> {
+              setPivotAngle(SlapdownConstants.pivotRaisedAngle);
+              setRoller(false);
+            }
+    );
   }
 
+  public Command intakeMidCommand() {
+    return startEnd(
+            () -> {
+              setPivotAngle(SlapdownConstants.pivotL1Angle);
+            },
+            () -> {
+              setPivotAngle(SlapdownConstants.pivotRaisedAngle);
+            }
+    );
+  }
   
-  public Command reverseIntakeCommand() {
+  public Command rollerIntakeCommand() {
+    return startEnd(
+      () -> setRoller(true), 
+      () -> setRoller(false)
+    );
+  }
+
+  public Command rollerOutakeCommand() {
     return startEnd(
       () -> setRollerReversed(true), 
       () -> setRollerReversed(false)

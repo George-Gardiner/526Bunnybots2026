@@ -66,6 +66,7 @@ public final class Constants {
     public static final double pivotI = 0;
     public static final double pivotD = 0;
     public static final double pivotRaisedAngle = 0;
-    public static final double pivotLoweredAngle = 30;
+    public static final double pivotLoweredAngle = 90;
+    public static final double pivotL1Angle = 30;
   } 
 }

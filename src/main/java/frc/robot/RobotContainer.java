@@ -38,16 +38,20 @@ public class RobotContainer
   private void configureBindings()
   {
     RobotModeTriggers.test().whileTrue(Commands.idle(swerve).withName("Live Tuning"));
-    // set a default command. This is the command that runs if no other command is set
+    //Swerve command binds
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
-    // When a or y button is pressed, add these command to the command sceduler
-    driverXbox.y().onTrue(slapdown.l1Command()); // swerve.zeroGyro() returns a command
+    driverXbox.povLeft().onTrue(swerve.zeroGyro());
+    //driverXbox.povRight().onTrue(swerve.setWheelsZero());
+    // Slapdown command binds
+    driverXbox.y().onTrue(slapdown.l1Command()); 
     driverXbox.a().onTrue(slapdown.groundCommand());
     driverXbox.b().onTrue(slapdown.transferCommand());
     driverXbox.x().onTrue(slapdown.stowCommand());
-    driverXbox.start().whileTrue(slapdown.transferCommand());
+    //driverXbox.x().onTrue(); someday vision...
     driverXbox.leftTrigger().whileTrue(slapdown.rollerIntakeCommand());
     driverXbox.rightTrigger().whileTrue(slapdown.rollerOutakeCommand());
+    //driverXbox.rightStick().onTrue(slapdown.stowCommand());
+    //Indexer command binds
     driverXbox.leftBumper().whileTrue(indexer.runReverseDexer());
     driverXbox.rightBumper().whileTrue(indexer.runDexer());
   }

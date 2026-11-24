@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.SlapdownConstants;
 
 public class SlapdownSubsystem extends SubsystemBase {
@@ -31,13 +32,14 @@ public class SlapdownSubsystem extends SubsystemBase {
     private final SparkMaxConfig pivotMotorConfigRight;
     private final SparkMaxConfig  rollerMotorConfig;    
     private boolean isRollerEnabled;
-    private boolean isLowering;
     AbsoluteEncoder throughBore;
+    RelativeEncoder encoderLeft;
 
     public SlapdownSubsystem() {
         motorPivotLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
         motorPivotRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
+        encoderLeft = motorPivotLeft.getEncoder();
         pivotMotorConfigLeft = new SparkMaxConfig();
         pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
@@ -51,8 +53,8 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
-        //pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
+        pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        //pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
@@ -71,21 +73,18 @@ public class SlapdownSubsystem extends SubsystemBase {
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
-        isLowering = true;
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Pivot Angle:", throughBore.getPosition());
+    SmartDashboard.putNumber("Pivot Angle Absolute:", throughBore.getPosition());
+    SmartDashboard.putNumber("Pivot Angle Relative:", encoderLeft.getPosition());
+    SmartDashboard.putNumber("Left current:", motorPivotLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Right current", motorPivotRight.getOutputCurrent());
   }
 
   public void movePivot(boolean isLowering) {
-    SmartDashboard.putBoolean("Is Intake Lowering/Lowered?", isLowering);
-    if (isLowering)
-        setPivotAngle(SlapdownConstants.pivotLoweringAngle);
-    else {
-        setPivotAngle(SlapdownConstants.pivotRaisedAngle);
-    }
+   
   }
 
   public void setRoller(boolean enabled) {
@@ -104,7 +103,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void setPivotAngle(double angle) {
-    pidPivotLeft.setSetpoint(angle, ControlType.kMAXMotionPositionControl);
+    pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
   }
 
   public void stop() {
@@ -126,19 +125,11 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return runOnce(
+    return run (
             () -> {
-              if (isLowering) {
-                setRoller(true);
-                movePivot(isLowering);
-                isLowering = false;
-              }
-              else {
-                setRoller(false);
-                movePivot(isLowering);
-                isLowering = true;
-              }
-            });
+                setPivotAngle(Constants.SlapdownConstants.pivotLoweredAngle);
+            }
+    );
   }
 
   

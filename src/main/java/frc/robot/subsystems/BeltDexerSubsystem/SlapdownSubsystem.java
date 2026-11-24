@@ -124,10 +124,37 @@ public class SlapdownSubsystem extends SubsystemBase {
     return throughBore.getPosition();
   }
 
-  public Command intakeCommand() {
+  public Command stowCommand() {
     return run (
             () -> {
-                setPivotAngle(Constants.SlapdownConstants.pivotLoweredAngle);
+                setPivotAngle(Constants.SlapdownConstants.pivotStowAngle);
+            }
+    );
+  }
+
+  
+  public Command l1Command() {
+    return run (
+            () -> {
+                setPivotAngle(Constants.SlapdownConstants.pivotl1Angle);
+            }
+    );
+  }
+
+  
+  public Command transferCommand() {
+    return run (
+            () -> {
+                setPivotAngle(Constants.SlapdownConstants.pivotTransferAngle);
+            }
+    );
+  }
+
+  
+  public Command groundCommand() {
+    return run (
+            () -> {
+                setPivotAngle(Constants.SlapdownConstants.pivotGroundAngle);
             }
     );
   }

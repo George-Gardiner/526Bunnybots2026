@@ -68,7 +68,10 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    ;
+    SmartDashboard.putNumber("Intake/Intake Velocity", motorRoller.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Intake/Intake Position", pivotMotorLeft.getEncoder().getPosition());
+    SmartDashboard.putNumber("Intake/Intake setpoint", pidRoller.getSetpoint());
+    SmartDashboard.putNumber("Intake/Intake Pivot Position", pivotMotorLeft.getEncoder().getPosition());
   }
 
   public void toggleRoller() {
@@ -120,11 +123,9 @@ public class SlapdownSubsystem extends SubsystemBase {
     return startEnd(
             () -> {
               setPivotAngle(SlapdownConstants.pivotLoweredAngle);
-              setRoller(true);
             },
             () -> {
               setPivotAngle(SlapdownConstants.pivotRaisedAngle);
-              setRoller(false);
             }
     );
   }

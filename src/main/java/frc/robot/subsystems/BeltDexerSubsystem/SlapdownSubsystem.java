@@ -25,23 +25,24 @@ import frc.robot.Constants.SlapdownConstants;
 
 public class SlapdownSubsystem extends SubsystemBase {
     private final SparkMax pivotMotorLeft;
-    // private final SparkMax pivotMotorRight;
+    private final SparkMax pivotMotorRight;
     private final SparkMax motorRoller;
     private final SparkClosedLoopController pidPivotLeft;
+    private final SparkClosedLoopController rollerPid;
     private final SparkMaxConfig pivotMotorConfigLeft;
     private final SparkMaxConfig pivotMotorConfigRight;
-    private final SparkMaxConfig  rollerMotorConfig;    
+    private final SparkMaxConfig rollerMotorConfig;    
     private boolean isRollerEnabled;
     AbsoluteEncoder throughBore;
     RelativeEncoder encoderLeft;
 
     public SlapdownSubsystem() {
         pivotMotorLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
-        // pivotMotorRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
+        pivotMotorRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
-        encoderLeft = motorPivotLeft.getEncoder();
+        encoderLeft = pivotMotorLeft.getEncoder();
         pivotMotorConfigLeft = new SparkMaxConfig();
-        // pivotMotorConfigRight = new SparkMaxConfig();
+        pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
@@ -55,16 +56,16 @@ public class SlapdownSubsystem extends SubsystemBase {
         rollerMotorConfig.closedLoop.pid(SlapdownConstants.rollerP, SlapdownConstants.rollerI, SlapdownConstants.rollerD);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
         // isRollerEnabled = false;
-        // pivotMotorConfigRight.follow(pivotMotorLeft, true);
+        pivotMotorConfigRight.follow(pivotMotorLeft, true);
 
         pivotMotorLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorRoller.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
         pidPivotLeft = pivotMotorLeft.getClosedLoopController();
 
-        pidRoller = motorRoller.getClosedLoopController();
+        rollerPid = motorRoller.getClosedLoopController();
 
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
@@ -73,23 +74,12 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Pivot Angle Absolute:", throughBore.getPosition());
+    SmartDashboard.putNumber("Intake/Intake Pivot Position Absolute", throughBore.getPosition());
     SmartDashboard.putNumber("Intake/Intake Pivot Position Relative", encoderLeft.getPosition());
-    SmartDashboard.putNumber("Left current:", motorPivotLeft.getOutputCurrent());
-    SmartDashboard.putNumber("Right current", motorPivotRight.getOutputCurrent());
+    SmartDashboard.putNumber("Left current:", pivotMotorLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Right current", pivotMotorRight.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Intake Velocity", motorRoller.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Intake/Intake setpoint", pidRoller.getSetpoint());
-  }
-
-  // public void setRoller(boolean enabled) {
-  //   if (enabled) {
-  //     motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
-  //   } 
-  //   else {  
-  //     stopRoller();
-  //   }
-  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
-  // }
+    SmartDashboard.putNumber("Intake/Intake setpoint", rollerPid.getSetpoint());
   }
 
   public void toggleRoller() {
@@ -98,7 +88,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void setRoller(boolean enabled) {
     if (enabled) {
-      pidRoller.setSetpoint(SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+      rollerPid.setSetpoint(SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
     }
     else {
       stopRoller();
@@ -110,7 +100,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   //make this later
   public void setRollerReversed(boolean enabled) {
     if (enabled) {
-      pidRoller.setSetpoint(-SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+      rollerPid.setSetpoint(-SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
     }
     else {
       stopRoller();
@@ -130,7 +120,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   public void stopPivot() {
     pivotMotorLeft.stopMotor();
-    // pivotMotorRight.stopMotor();
   }
 
   public void stopRoller() {
@@ -148,22 +137,11 @@ public class SlapdownSubsystem extends SubsystemBase {
             }
     );
   }
-
-  public Command intakeMidCommand() {
-    return startEnd(
-            () -> {
-              setPivotAngle(SlapdownConstants.pivotL1Angle);
-            },
-            () -> {
-              setPivotAngle(SlapdownConstants.pivotRaisedAngle);
-            }
-    );
-  }
   
   public Command l1Command() {
     return run (
             () -> {
-                setPivotAngle(Constants.SlapdownConstants.pivotl1Angle);
+                setPivotAngle(Constants.SlapdownConstants.pivotL1Angle);
             }
     );
   }
@@ -185,26 +163,6 @@ public class SlapdownSubsystem extends SubsystemBase {
             }
     );
   }
-
-  // public Command rollerCommand(boolean enabled) {
-  //   if (enabled) {
-  //     motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
-  //   } 
-  //   else {  
-  //     stopRoller();
-  //   }
-  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
-  // }
-
-  // public Command reverseRollerCommand(boolean enabled) {
-  //   if (enabled) {
-  //     motorRoller.set(-SlapdownConstants.rollerDutyCycleSpeed); //change ts
-  //   } 
-  //   else {  
-  //     stopRoller();
-  //   }
-  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
-  // }
 
   public Command reverseRollerCommand() {
     return run (

@@ -65,7 +65,7 @@ public final class Constants {
     public static final double pivotI = 0;
     public static final double pivotD = 0;
     public static final double pivotStowAngle = 10;
-    public static final double pivotl1Angle = 10;
+    public static final double pivotL1Angle = 10;
     public static final double pivotTransferAngle = 10;
     public static final double pivotGroundAngle = 10;
     public static final double rollerDutyCycleSpeed = 0.1;

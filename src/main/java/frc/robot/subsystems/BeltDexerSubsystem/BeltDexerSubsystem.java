@@ -90,4 +90,17 @@ public class BeltDexerSubsystem extends SubsystemBase {
             this
         );
     }
+
+    public Command runReverseDexer() {
+        return Commands.startEnd(
+            () -> {
+                motorA.set(BeltDexerConstants.MotorASpeed);
+                motorB.set(BeltDexerConstants.MotorBSpeed);
+            },
+            () -> {
+                stop();
+            },
+            this
+        );
+    }
 }

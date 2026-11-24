@@ -83,19 +83,15 @@ public class SlapdownSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right current", motorPivotRight.getOutputCurrent());
   }
 
-  public void movePivot(boolean isLowering) {
-   
-  }
-
-  public void setRoller(boolean enabled) {
-    if (enabled) {
-      motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
-    } 
-    else {  
-      stopRoller();
-    }
-    SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
-  }
+  // public void setRoller(boolean enabled) {
+  //   if (enabled) {
+  //     motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
+  //   } 
+  //   else {  
+  //     stopRoller();
+  //   }
+  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
+  // }
 
   //make this later
   public void setRollerReversed(boolean enabled) {
@@ -107,7 +103,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    setRoller(false);
+    //setRoller(false);
     stopPivot();
   }
 
@@ -159,7 +155,34 @@ public class SlapdownSubsystem extends SubsystemBase {
     );
   }
 
-  
+  // public Command rollerCommand(boolean enabled) {
+  //   if (enabled) {
+  //     motorRoller.set(SlapdownConstants.rollerDutyCycleSpeed); //change ts
+  //   } 
+  //   else {  
+  //     stopRoller();
+  //   }
+  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
+  // }
+
+  // public Command reverseRollerCommand(boolean enabled) {
+  //   if (enabled) {
+  //     motorRoller.set(-SlapdownConstants.rollerDutyCycleSpeed); //change ts
+  //   } 
+  //   else {  
+  //     stopRoller();
+  //   }
+  //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
+  // }
+
+  public Command reverseRollerCommand() {
+    return run (
+            () -> {
+                setPivotAngle(Constants.SlapdownConstants.pivotGroundAngle);
+            }
+    );
+  }
+
   public Command reverseIntakeCommand() {
     return startEnd(
       () -> setRollerReversed(true), 

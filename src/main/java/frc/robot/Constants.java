@@ -58,7 +58,7 @@ public final class Constants {
     public static final int pivotMotorRightID = 17;
     public static final int rollerMotorID = 18;
     public static final boolean invertPivot = false;
-    public static final boolean invertRoller = false;
+    public static final boolean invertRoller = true;
     public static final int pivotCurrentLimit = 40;
     public static final int rollerCurrentLimit = 40;
     public static final double pivotP = 1;

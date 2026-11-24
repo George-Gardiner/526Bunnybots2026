@@ -41,11 +41,12 @@ public class RobotContainer
     // set a default command. This is the command that runs if no other command is set
     swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
     // When a or y button is pressed, add these command to the command sceduler
-    driverXbox.y().onTrue(slapdown.l1Command()); // swerve.zeroGyro() returns a command
-    driverXbox.a().whileTrue(slapdown.groundCommand());
-    driverXbox.b().toggleOnTrue(slapdown.transferCommand());
-    driverXbox.y().onTrue(swerve.zeroGyro());
-    driverXbox.rightStick().onTrue(slapdown.stowCommand());
-    driverXbox.
+    driverXbox.y().onTrue(swerve.zeroGyro()); // swerve.zeroGyro() returns a command
+    driverXbox.a().whileTrue(indexer.runDexer());
+    driverXbox.b().toggleOnTrue(swerve.setWheelsZero());
+    driverXbox.x().whileTrue(slapdown.intakeDownCommand());
+    driverXbox.start().whileTrue(slapdown.intakeMidCommand());
+    driverXbox.leftBumper().whileTrue(slapdown.rollerIntakeCommand());
+    driverXbox.rightBumper().whileTrue(slapdown.rollerOutakeCommand());
   }
 }

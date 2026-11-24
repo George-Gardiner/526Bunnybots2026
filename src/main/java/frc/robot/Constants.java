@@ -50,13 +50,16 @@ public final class Constants {
     public static final double MotorBSpeed = 0.9;
   }
   public static class SlapdownConstants {
+    public static final double rollerVelocity = 3600; //in RPM
+    public static final double rollerP = 0.0001;
+    public static final double rollerI = 0.000001;
+    public static final double rollerD = 0;
     public static final int pivotMotorLeftID = 16; //something's wrong with this motor...
     public static final int pivotMotorRightID = 17;
     public static final int rollerMotorID = 18;
-    public static final boolean invertPivotLeft = false;
-    public static final boolean invertPivotRight = false;
-    public static final boolean invertRoller = false;
-    public static final int pivotCurrentLimit = 30;
+    public static final boolean invertPivot = false;
+    public static final boolean invertRoller = true;
+    public static final int pivotCurrentLimit = 40;
     public static final int rollerCurrentLimit = 40;
     public static final double pivotP = 0.01;
     public static final double pivotI = 0;

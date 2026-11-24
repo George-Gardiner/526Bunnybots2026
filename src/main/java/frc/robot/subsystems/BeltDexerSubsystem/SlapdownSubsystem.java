@@ -5,6 +5,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -23,11 +24,10 @@ import frc.robot.Constants;
 import frc.robot.Constants.SlapdownConstants;
 
 public class SlapdownSubsystem extends SubsystemBase {
-    private final SparkMax motorPivotLeft;
-    private final SparkMax motorPivotRight;
+    private final SparkMax pivotMotorLeft;
+    // private final SparkMax pivotMotorRight;
     private final SparkMax motorRoller;
     private final SparkClosedLoopController pidPivotLeft;
-    private final SparkClosedLoopController pidPivotRight;
     private final SparkMaxConfig pivotMotorConfigLeft;
     private final SparkMaxConfig pivotMotorConfigRight;
     private final SparkMaxConfig  rollerMotorConfig;    
@@ -36,20 +36,14 @@ public class SlapdownSubsystem extends SubsystemBase {
     RelativeEncoder encoderLeft;
 
     public SlapdownSubsystem() {
-        motorPivotLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
-        motorPivotRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
+        pivotMotorLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
+        // pivotMotorRight = new SparkMax(SlapdownConstants.pivotMotorRightID, SparkLowLevel.MotorType.kBrushless);
         motorRoller = new SparkMax(SlapdownConstants.rollerMotorID, SparkLowLevel.MotorType.kBrushless);
         encoderLeft = motorPivotLeft.getEncoder();
         pivotMotorConfigLeft = new SparkMaxConfig();
-        pivotMotorConfigRight = new SparkMaxConfig();
+        // pivotMotorConfigRight = new SparkMaxConfig();
         rollerMotorConfig = new SparkMaxConfig();
-        try {
-           throughBore = motorPivotLeft.getAbsoluteEncoder();
-        } 
-        catch (IllegalStateException e) {
-          System.out.println(e.getMessage());
-        }
-        pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivotLeft);
+        pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
@@ -58,17 +52,19 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
+        rollerMotorConfig.closedLoop.pid(SlapdownConstants.rollerP, SlapdownConstants.rollerI, SlapdownConstants.rollerD);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
+        // isRollerEnabled = false;
+        // pivotMotorConfigRight.follow(pivotMotorLeft, true);
 
-        pivotMotorConfigRight.follow(motorPivotLeft, true);
-
-        motorPivotLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        motorPivotRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotorLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorRoller.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-        pidPivotLeft = motorPivotLeft.getClosedLoopController();
-        pidPivotRight = motorPivotRight.getClosedLoopController();
+        pidPivotLeft = pivotMotorLeft.getClosedLoopController();
+
+        pidRoller = motorRoller.getClosedLoopController();
 
         SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
@@ -78,9 +74,11 @@ public class SlapdownSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Pivot Angle Absolute:", throughBore.getPosition());
-    SmartDashboard.putNumber("Pivot Angle Relative:", encoderLeft.getPosition());
+    SmartDashboard.putNumber("Intake/Intake Pivot Position Relative", encoderLeft.getPosition());
     SmartDashboard.putNumber("Left current:", motorPivotLeft.getOutputCurrent());
     SmartDashboard.putNumber("Right current", motorPivotRight.getOutputCurrent());
+    SmartDashboard.putNumber("Intake/Intake Velocity", motorRoller.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Intake/Intake setpoint", pidRoller.getSetpoint());
   }
 
   // public void setRoller(boolean enabled) {
@@ -92,10 +90,33 @@ public class SlapdownSubsystem extends SubsystemBase {
   //   }
   //   SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   // }
+  }
+
+  public void toggleRoller() {
+    setRoller(!isRollerEnabled);
+  }
+
+  public void setRoller(boolean enabled) {
+    if (enabled) {
+      pidRoller.setSetpoint(SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+    }
+    else {
+      stopRoller();
+    }
+    isRollerEnabled = enabled;
+    SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
+  }
 
   //make this later
   public void setRollerReversed(boolean enabled) {
-    motorPivotLeft.set(-SlapdownConstants.rollerDutyCycleSpeed);
+    if (enabled) {
+      pidRoller.setSetpoint(-SlapdownConstants.rollerVelocity, SparkBase.ControlType.kVelocity);
+    }
+    else {
+      stopRoller();
+    }
+    isRollerEnabled = enabled;
+    SmartDashboard.putBoolean("Intake/Intake Running", isRollerEnabled);
   }
 
   public void setPivotAngle(double angle) {
@@ -108,8 +129,8 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void stopPivot() {
-    motorPivotLeft.stopMotor();
-    motorPivotRight.stopMotor();
+    pivotMotorLeft.stopMotor();
+    // pivotMotorRight.stopMotor();
   }
 
   public void stopRoller() {
@@ -128,6 +149,16 @@ public class SlapdownSubsystem extends SubsystemBase {
     );
   }
 
+  public Command intakeMidCommand() {
+    return startEnd(
+            () -> {
+              setPivotAngle(SlapdownConstants.pivotL1Angle);
+            },
+            () -> {
+              setPivotAngle(SlapdownConstants.pivotRaisedAngle);
+            }
+    );
+  }
   
   public Command l1Command() {
     return run (
@@ -183,16 +214,22 @@ public class SlapdownSubsystem extends SubsystemBase {
     );
   }
 
-  public Command reverseIntakeCommand() {
+  public Command rollerIntakeCommand() {
+    return startEnd(
+      () -> setRoller(true), 
+      () -> setRoller(false)
+    );
+  }
+
+  public Command rollerOutakeCommand() {
     return startEnd(
       () -> setRollerReversed(true), 
       () -> setRollerReversed(false)
     );
   }
 
-
   @Override
   public void simulationPeriodic() {
 
   }
-}
+} 

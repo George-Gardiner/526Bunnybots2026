@@ -46,6 +46,7 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
         pivotMotorConfigLeft.encoder.positionConversionFactor(360.0/96);
         pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(360);
+        pivotMotorConfigLeft.absoluteEncoder.inverted(true);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
         pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         //pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
@@ -66,7 +67,6 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         rollerPid = motorRoller.getClosedLoopController();
 
-        SmartDashboard.setDefaultBoolean("Is Intake Lowering/Lowered?", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
   }

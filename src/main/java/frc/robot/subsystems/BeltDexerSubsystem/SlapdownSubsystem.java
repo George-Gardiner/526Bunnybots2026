@@ -67,6 +67,8 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         rollerPid = motorRoller.getClosedLoopController();
 
+        setPivotAngle(SlapdownConstants.pivotStowAngle);
+
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);
   }
@@ -130,7 +132,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public Command stowCommand() {
-    return run (
+    return runOnce (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotStowAngle);
             }
@@ -138,7 +140,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
   
   public Command l1Command() {
-    return run (
+    return runOnce (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotL1Angle);
             }
@@ -147,7 +149,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   
   public Command transferCommand() {
-    return run (
+    return runOnce (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotTransferAngle);
             }
@@ -156,7 +158,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   
   public Command groundCommand() {
-    return run (
+    return runOnce (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotGroundAngle);
             }

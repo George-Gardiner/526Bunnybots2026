@@ -44,8 +44,8 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
-        pivotMotorConfigLeft.encoder.positionConversionFactor(360.0/96);
-        pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(360);
+        pivotMotorConfigLeft.encoder.positionConversionFactor(SlapdownConstants.relativeEncoderPositionConversionFactor); //gear ratio was 96 is now 60
+        pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(SlapdownConstants.absoluteEncoderPositionConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.inverted(true);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
         pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);

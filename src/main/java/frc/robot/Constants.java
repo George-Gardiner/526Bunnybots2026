@@ -69,5 +69,8 @@ public final class Constants {
     public static final double pivotTransferAngle = 115;
     public static final double pivotGroundAngle = 135;
     public static final double rollerDutyCycleSpeed = 0.1;
+    public static final int pivotGearRatio = 60;
+    public static final double relativeEncoderPositionConversionFactor = 360.0/pivotGearRatio;
+    public static final double absoluteEncoderPositionConversionFactor = 360.0;
   } 
 }

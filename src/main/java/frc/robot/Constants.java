@@ -50,7 +50,7 @@ public final class Constants {
     public static final double MotorBSpeed = 0.9;
   }
   public static class SlapdownConstants {
-    public static final double rollerVelocity = 3600;
+    public static final double rollerVelocity = 3000;
     public static final double rollerP = 0.0001;
     public static final double rollerI = 0.000001;
     public static final double rollerD = 0;
@@ -64,13 +64,20 @@ public final class Constants {
     public static final double pivotP = 0.002;
     public static final double pivotI = 0;
     public static final double pivotD = 0;
-    public static final double pivotStowAngle = 10;
+    public static final double pivotKv = 0.1209; //in voltage per rotations per minute
+    public static final double pivotKa = 0;
+    public static final double pivotKcos = 0.907; //in voltage
+    public static final double pivotCosRatio = 1.0/360.0;
+    public static final double pivotStowAngle = 200;
     public static final double pivotL1Angle = 60;
-    public static final double pivotTransferAngle = 115;
-    public static final double pivotGroundAngle = 135;
+    public static final double pivotTransferAngle = 20;
+    public static final double pivotGroundAngle = 0;
     public static final double rollerDutyCycleSpeed = 0.1;
     public static final int pivotGearRatio = 60;
-    public static final double relativeEncoderPositionConversionFactor = 360.0/pivotGearRatio;
-    public static final double absoluteEncoderPositionConversionFactor = 360.0;
+    public static final int rollerGearRatio = 3;
+    public static final double rollerRelativeEncoderVelocityConversionFactor = 1.0/rollerGearRatio;;
+    public static final double pivotRelativeEncoderVelocityConversionFactor = 1.0/pivotGearRatio;
+    public static final double pivotRelativeEncoderPositionConversionFactor = 360.0/pivotGearRatio;
+    public static final double pivotAbsoluteEncoderPositionConversionFactor = 360.0;
   } 
 }

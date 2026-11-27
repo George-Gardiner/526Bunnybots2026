@@ -44,20 +44,25 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.inverted(SlapdownConstants.invertPivot);
         pivotMotorConfigLeft.idleMode(IdleMode.kCoast);
         pivotMotorConfigLeft.smartCurrentLimit(SlapdownConstants.pivotCurrentLimit);
-        pivotMotorConfigLeft.encoder.positionConversionFactor(SlapdownConstants.relativeEncoderPositionConversionFactor); //gear ratio was 96 is now 60
-        pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(SlapdownConstants.absoluteEncoderPositionConversionFactor);
+        pivotMotorConfigLeft.encoder.positionConversionFactor(SlapdownConstants.pivotRelativeEncoderPositionConversionFactor); //gear ratio was 96 is now 60
+        pivotMotorConfigLeft.encoder.velocityConversionFactor(SlapdownConstants.pivotRelativeEncoderVelocityConversionFactor);
+        pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.inverted(true);
-        pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
+        pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD)
+                                       .feedForward
+                                       .kV(SlapdownConstants.pivotKv)
+                                       .kCos(SlapdownConstants.pivotKcos)
+                                       .kCosRatio(SlapdownConstants.pivotCosRatio);
         pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         //pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
-        
+         
         rollerMotorConfig.inverted(SlapdownConstants.invertRoller);
         rollerMotorConfig.idleMode(IdleMode.kCoast);
         rollerMotorConfig.closedLoop.pid(SlapdownConstants.rollerP, SlapdownConstants.rollerI, SlapdownConstants.rollerD);
         rollerMotorConfig.smartCurrentLimit(SlapdownConstants.rollerCurrentLimit);
         // isRollerEnabled = false;
         pivotMotorConfigRight.follow(pivotMotorLeft, true);
-        rollerMotorConfig.encoder.velocityConversionFactor(3);
+        rollerMotorConfig.encoder.velocityConversionFactor(SlapdownConstants.rollerRelativeEncoderVelocityConversionFactor);
 
         pivotMotorLeft.configure(pivotMotorConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         pivotMotorRight.configure(pivotMotorConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -67,7 +72,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
         rollerPid = motorRoller.getClosedLoopController();
 
-        setPivotAngle(SlapdownConstants.pivotStowAngle);
+        //setPivotAngle(SlapdownConstants.pivotStowAngle);
 
         SmartDashboard.setDefaultBoolean("Intake/Intake Running", false);
         SmartDashboard.setDefaultBoolean("Intake/Intake Reversed", false);

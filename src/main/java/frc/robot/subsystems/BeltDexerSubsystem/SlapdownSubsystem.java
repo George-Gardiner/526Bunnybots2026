@@ -10,8 +10,10 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,11 +50,7 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.encoder.velocityConversionFactor(SlapdownConstants.pivotRelativeEncoderVelocityConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.inverted(true);
-        pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD)
-                                       .feedForward
-                                       .kV(SlapdownConstants.pivotKv)
-                                       .kCos(SlapdownConstants.pivotKcos)
-                                       .kCosRatio(SlapdownConstants.pivotCosRatio);
+        pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
         pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         //pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
          
@@ -86,6 +84,8 @@ public class SlapdownSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right current", pivotMotorRight.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Intake Velocity", motorRoller.getEncoder().getVelocity());
     SmartDashboard.putNumber("Intake/Intake setpoint", rollerPid.getSetpoint());
+    SmartDashboard.putNumber("Intake/pivot setPoint", pidPivotLeft.getSetpoint());
+    SmartDashboard.putNumber("Intake/Intake pivot feedforward", Math.cos((throughBore.getPosition() - SlapdownConstants.horizontalAngle)/SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor * 2 * Math.PI) * SlapdownConstants.pivotKcos);
   }
 
   public void toggleRoller() {
@@ -116,7 +116,9 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public void setPivotAngle(double angle) {
-    pidPivotLeft.setSetpoint(angle, ControlType.kPosition);
+    double currentAngle = throughBore.getPosition();
+    double feedForward = -Math.cos((currentAngle - SlapdownConstants.horizontalAngle)/SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor * 2 * Math.PI) * SlapdownConstants.pivotKcos;
+    pidPivotLeft.setSetpoint(angle, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward, ArbFFUnits.kVoltage);
   }
 
   public void stop() {
@@ -137,7 +139,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
 
   public Command stowCommand() {
-    return runOnce (
+    return run (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotStowAngle);
             }
@@ -145,7 +147,7 @@ public class SlapdownSubsystem extends SubsystemBase {
   }
   
   public Command l1Command() {
-    return runOnce (
+    return run (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotL1Angle);
             }
@@ -154,7 +156,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   
   public Command transferCommand() {
-    return runOnce (
+    return run(
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotTransferAngle);
             }
@@ -163,7 +165,7 @@ public class SlapdownSubsystem extends SubsystemBase {
 
   
   public Command groundCommand() {
-    return runOnce (
+    return run (
             () -> {
                 setPivotAngle(Constants.SlapdownConstants.pivotGroundAngle);
             }

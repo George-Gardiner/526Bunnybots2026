@@ -64,7 +64,7 @@ public final class Constants {
     public static final double pivotP = 0.003;
     public static final double pivotI = 0;
     public static final double pivotD = 0;
-    public static final double pivotKcos = 2; //in voltage
+    public static final double pivotKcos = .9; //in voltage
     public static final double pivotStowAngle = 10;
     public static final double pivotL1Angle = 70;
     public static final double pivotTransferAngle = 110;

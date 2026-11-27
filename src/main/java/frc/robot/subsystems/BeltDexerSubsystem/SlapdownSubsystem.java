@@ -33,6 +33,7 @@ public class SlapdownSubsystem extends SubsystemBase {
     private boolean isRollerEnabled;
     AbsoluteEncoder throughBore;
     RelativeEncoder encoderLeft;
+    private double lastPivotFeedforward = 0;
 
     public SlapdownSubsystem() {
         pivotMotorLeft = new SparkMax(SlapdownConstants.pivotMotorLeftID, SparkLowLevel.MotorType.kBrushless);
@@ -50,6 +51,7 @@ public class SlapdownSubsystem extends SubsystemBase {
         pivotMotorConfigLeft.encoder.velocityConversionFactor(SlapdownConstants.pivotRelativeEncoderVelocityConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.positionConversionFactor(SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor);
         pivotMotorConfigLeft.absoluteEncoder.inverted(true);
+        pivotMotorConfigLeft.absoluteEncoder.averageDepth(SlapdownConstants.pivotAbsEncoderAverageDepth);
         pivotMotorConfigLeft.closedLoop.pid(SlapdownConstants.pivotP, SlapdownConstants.pivotI, SlapdownConstants.pivotD);
         pivotMotorConfigLeft.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         //pivotMotorConfigLeft.closedLoop.maxMotion.cruiseVelocity(1500).maxAcceleration(3000);
@@ -85,7 +87,17 @@ public class SlapdownSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Intake Velocity", motorRoller.getEncoder().getVelocity());
     SmartDashboard.putNumber("Intake/Intake setpoint", rollerPid.getSetpoint());
     SmartDashboard.putNumber("Intake/pivot setPoint", pidPivotLeft.getSetpoint());
-    SmartDashboard.putNumber("Intake/Intake pivot feedforward", Math.cos((throughBore.getPosition() - SlapdownConstants.horizontalAngle)/SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor * 2 * Math.PI) * SlapdownConstants.pivotKcos);
+    SmartDashboard.putNumber("Intake/Intake pivot feedforward", lastPivotFeedforward);
+
+    // Pivot telemetry (AdvantageScope: /SmartDashboard/Pivot/*). Compare Position against
+    // "Intake Pivot Position Relative" to see the drivetrain slack.
+    SmartDashboard.putNumber("Pivot/Position", throughBore.getPosition());
+    SmartDashboard.putNumber("Pivot/Setpoint", pidPivotLeft.getSetpoint());
+    SmartDashboard.putNumber("Pivot/AppliedVolts", pivotMotorLeft.getAppliedOutput() * pivotMotorLeft.getBusVoltage());
+    SmartDashboard.putNumber("Pivot/FeedforwardVolts", lastPivotFeedforward);
+    SmartDashboard.putNumber("Pivot/VelocityDegPerSec", encoderLeft.getVelocity() * 360.0 / 60.0);
+    SmartDashboard.putNumber("Pivot/LeftCurrent", pivotMotorLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Pivot/RightCurrent", pivotMotorRight.getOutputCurrent());
   }
 
   public void toggleRoller() {
@@ -118,6 +130,12 @@ public class SlapdownSubsystem extends SubsystemBase {
   public void setPivotAngle(double angle) {
     double currentAngle = throughBore.getPosition();
     double feedForward = -Math.cos((currentAngle - SlapdownConstants.horizontalAngle)/SlapdownConstants.pivotAbsoluteEncoderPositionConversionFactor * 2 * Math.PI) * SlapdownConstants.pivotKcos;
+    // Static-friction kick toward the setpoint; P alone is too weak to break the ~0.2-0.35 V friction band
+    double error = angle - currentAngle;
+    if (Math.abs(error) > SlapdownConstants.pivotKsDeadband) {
+      feedForward += Math.signum(error) * SlapdownConstants.pivotKs;
+    }
+    lastPivotFeedforward = feedForward;
     pidPivotLeft.setSetpoint(angle, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward, ArbFFUnits.kVoltage);
   }
 

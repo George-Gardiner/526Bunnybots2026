@@ -61,10 +61,13 @@ public final class Constants {
     public static final boolean invertRoller = true;
     public static final int pivotCurrentLimit = 40;
     public static final int rollerCurrentLimit = 40;
-    public static final double pivotP = 0.003;
+    public static final double pivotP = 0.005; // needs pivotAbsEncoderAverageDepth = 8; loose chain (~20-30 deg slack) makes higher kP whip near vertical
     public static final double pivotI = 0;
     public static final double pivotD = 0;
-    public static final double pivotKcos = .8; //in voltage
+    public static final double pivotKcos = 0.58; //in voltage; measured gravity balance at 65/85/105/124 deg (friction band ~+-0.2-0.35 V)
+    public static final double pivotKs = 0.35; // volts pushed toward the setpoint to break static friction
+    public static final double pivotKsDeadband = 0.6; // degrees; kS turns off inside this error so it doesn't hunt
+    public static final int pivotAbsEncoderAverageDepth = 8; // REV default 128 adds ~60 ms lag that made kP 0.005 oscillate
     public static final double pivotStowAngle = 10;
     public static final double pivotL1Angle = 70;
     public static final double pivotTransferAngle = 110;
